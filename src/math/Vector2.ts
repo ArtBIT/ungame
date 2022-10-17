@@ -6,30 +6,30 @@ export interface IVector2 {
 export class Vector2 implements IVector2 {
   x: number;
   y: number;
-  private _length = 0;
   private _ux = 0;
   private _uy = 0;
-  private isDirty = false;
+  private _length = 0;
+  private _isDirty = false;
 
   constructor(x = 0, y = 0) {
     this.x = x;
     this.y = y;
-    this.isDirty = true;
+    this._isDirty = true;
   }
   get length(): number {
-    if (this.isDirty) {
+    if (this._isDirty) {
       this.recalc();
     }
     return this._length;
   }
   get ux(): number {
-    if (this.isDirty) {
+    if (this._isDirty) {
       this.recalc();
     }
     return this._ux;
   }
   get uy(): number {
-    if (this.isDirty) {
+    if (this._isDirty) {
       this.recalc();
     }
     return this._ux;
@@ -43,7 +43,7 @@ export class Vector2 implements IVector2 {
   set(x: number, y: number): Vector2 {
     this.x = x;
     this.y = y;
-    this.isDirty = true;
+    this._isDirty = true;
     return this;
   }
   equals({ x, y }: IVector2): boolean {
@@ -74,9 +74,7 @@ export class Vector2 implements IVector2 {
     return this.x * y - this.y * x;
   }
   lerp({ x, y }: IVector2, t = 0): Vector2 {
-    this.x += t * (x - this.x);
-    this.y += t * (y - this.y);
-    return this;
+    return this.set(this.x + t * (x - this.x), this.y + t * (y - this.y));
   }
   scale(x: number, y = x): Vector2 {
     return this.set(this.x * x, this.y * y);
@@ -93,12 +91,12 @@ export class Vector2 implements IVector2 {
     return new Vector2(-this.uy, this.ux);
   }
   recalc(): Vector2 {
-    if (this.isDirty) {
+    if (this._isDirty) {
       const lengthSquared = this.x * this.x + this.y * this.y;
       this._length = Math.sqrt(lengthSquared);
       this._ux = this._length ? this.x / this._length : 0;
       this._uy = this._length ? this.y / this._length : 0;
-      this.isDirty = false;
+      this._isDirty = false;
     }
     return this;
   }
@@ -115,6 +113,14 @@ export class Vector2 implements IVector2 {
     const scalar = this.dot(src) / src.dot(src);
     return this.copy(src).scale(scalar);
   }
+
+  static ZERO = Object.freeze(new Vector2(0, 0));
+  static ONE = Object.freeze(new Vector2(1, 1));
+
+  static UP = Object.freeze(new Vector2(0, 1));
+  static DOWN = Object.freeze(new Vector2(0, -1));
+  static RIGHT = Object.freeze(new Vector2(1, 0));
+  static LEFT = Object.freeze(new Vector2(-1, 0));
 }
 
 export default Vector2;
